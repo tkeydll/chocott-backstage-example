@@ -1,0 +1,14 @@
+.git
+.github
+.yarn/cache
+.yarn/install-state.gz
+*.local.yaml
+dist-types
+node_modules
+packages/*/dist
+packages/*/node_modules
+plugins/*/dist
+plugins/*/node_modules
+chocott-contents
+*-credentials.yaml
+github-credentials.yaml.sample

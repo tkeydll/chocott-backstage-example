@@ -1,0 +1,23 @@
+site_name: chocott-backstage
+docs_dir: docs
+nav:
+  - Home: index.md
+  - Quick Start:
+      - はじめに: quick-start/index.md
+      - パーソナルアカウントで利用する場合: quick-start/personal.md
+      - Organizationアカウントで利用する場合: quick-start/organization.md
+  - 機能詳細:
+      - ユーザー認証:
+          - 概要: authentication/index.md
+          - GitHub App: authentication/githubapp/index.md
+          - GitHub PAT: authentication/githubpat/index.md
+      - アクセス承認: authorization/index.md
+      - Integration: integration/index.md
+      - TechDocs: techdocs/index.md
+      - Plugin導入による機能拡張: plugins/index.md
+      - Database: database/index.md
+  - カタログ情報:
+      - ソフトウェアカタログ: catalogs/index.md
+      - ソフトウェアテンプレート: software-templates/index.md
+plugins:
+  - techdocs-core

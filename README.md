@@ -2,7 +2,7 @@
 
 chocott-backstage（ちょこっとBackstage）は、[Backstage](https://backstage.io)をすぐに試せるテンプレートリポジトリです。
 
-> **👉 すぐに試したい方は [Quick Startガイド](./chocott-contents/docs/quick-start/index.md) へ**
+> **👉 すぐに試したい方は [Quick Startガイド](./quickstart.md) へ**
 
 ## ちょこっとBackstageとは
 

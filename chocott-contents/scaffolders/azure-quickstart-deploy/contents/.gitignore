@@ -1,0 +1,7 @@
+# General
+.DS_Store
+*.log
+*.tmp
+
+# Azure deployment outputs
+deployment-output.json

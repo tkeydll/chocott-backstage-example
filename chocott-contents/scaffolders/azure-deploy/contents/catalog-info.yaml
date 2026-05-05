@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.projectName }}
+  description: ${{ values.description }}
+spec:
+  type: infrastructure
+  owner: user:guest
+  lifecycle: production

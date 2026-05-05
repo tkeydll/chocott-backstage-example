@@ -1,0 +1,30 @@
+# 依存関係
+node_modules/
+dist/
+build/
+*.log
+
+# ローカル環境
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Terraform
+.terraform/
+terraform.tfstate*
+*.tfvars
+
+# Bicep
+*.json
+!bicep/main.bicep

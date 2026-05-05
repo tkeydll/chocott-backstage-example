@@ -1,0 +1,114 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: azure-resource-deployment
+  title: Azureリソースデプロイテンプレート
+  description: Bicepテンプレートを使ってAzureリソースをデプロイするテンプレート。GitHub Actionsで自動デプロイします
+  tags:
+    - azure
+    - bicep
+    - infrastructure
+spec:
+  owner: user:guest
+  type: infrastructure
+
+  parameters:
+    - title: プロジェクト情報
+      required:
+        - projectName
+        - description
+      properties:
+        projectName:
+          title: プロジェクト名
+          type: string
+          description: プロジェクトの一意の識別子
+          ui:autofocus: true
+          pattern: '^[a-z0-9-]{3,50}$'
+          ui:help: '3〜50文字の小文字、数字、ハイフンのみ'
+
+        description:
+          title: 説明
+          type: string
+          description: このプロジェクトの説明
+
+    - title: Azure設定
+      required:
+        - azureSubscriptionId
+        - resourceGroupName
+        - location
+      properties:
+        azureSubscriptionId:
+          title: Azureサブスクリプション ID
+          type: string
+          description: デプロイ先のAzureサブスクリプション ID
+          ui:help: 'az account show --query id -o tsv で確認できます'
+
+        resourceGroupName:
+          title: リソースグループ名
+          type: string
+          description: リソースを作成するリソースグループ
+          ui:help: '既存のリソースグループを指定、または新規作成されます'
+
+        location:
+          title: デプロイ先リージョン
+          type: string
+          enum:
+            - japaneast
+            - japanwest
+            - eastasia
+            - southeastasia
+            - westeurope
+          default: japaneast
+          description: Azureリソースをデプロイするリージョン
+
+    - title: リポジトリ情報
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: リポジトリロケーション
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+
+  steps:
+    - id: fetch-base
+      name: テンプレートコンテンツを取得
+      action: fetch:template
+      input:
+        url: ./contents
+        values:
+          projectName: ${{ parameters.projectName }}
+          description: ${{ parameters.description }}
+          azureSubscriptionId: ${{ parameters.azureSubscriptionId }}
+          resourceGroupName: ${{ parameters.resourceGroupName }}
+          location: ${{ parameters.location }}
+
+    - id: publish
+      name: GitHubに発行
+      action: publish:github
+      input:
+        description: ${{ parameters.description }}
+        repoUrl: ${{ parameters.repoUrl }}
+        defaultBranch: main
+        gitAuthorName: Backstage Scaffolder
+        gitAuthorEmail: scaffolder@backstage.io
+
+    - id: register
+      name: カタログに登録
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+  output:
+    links:
+      - title: リポジトリ
+        url: ${{ steps['publish'].output.remoteUrl }}
+      - title: GitHub Actions
+        url: ${{ steps['publish'].output.remoteUrl }}/actions
+      - title: カタログで表示
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}

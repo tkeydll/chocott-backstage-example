@@ -31,8 +31,7 @@ backend:
 integrations:
   github:
     - host: github.com
-      apps:
-        - $include: ${GITHUB_CREDENTIAL_FILE}
+      token: ${GITHUB_TOKEN}
 
 catalog:
   rules:

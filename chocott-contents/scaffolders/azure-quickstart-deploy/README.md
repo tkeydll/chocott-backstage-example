@@ -32,7 +32,7 @@ Backstageテンプレートを使用して、[tkeydll/azure-quickstart-templates
 az ad sp create-for-rbac \
   --name "backstage-quickstart-deploy-sp" \
   --role Contributor \
-  --scopes /subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<RESOURCE_GROUP> \
+  --scopes /subscriptions/<SUBSCRIPTION_ID> \
   --output json
 ```
 

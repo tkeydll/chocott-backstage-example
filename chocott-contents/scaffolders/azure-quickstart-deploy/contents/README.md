@@ -41,7 +41,7 @@ Azure CLIを使用してサービスプリンシパルを作成し、Contributor
 az ad sp create-for-rbac \
   --name "backstage-deploy-sp" \
   --role Contributor \
-  --scopes /subscriptions/${{ values.azureSubscriptionId }}/resourceGroups/${{ values.resourceGroupName }} \
+  --scopes /subscriptions/${{ values.azureSubscriptionId }} \
   --output json
 ```
 

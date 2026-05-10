@@ -68,8 +68,8 @@ spec:
         resourceGroupName:
           title: リソースグループ名
           type: string
-          description: リソースを作成するリソースグループ名（存在しない場合は新規作成されます）
-          ui:help: '既存のリソースグループを指定、または新規作成されます'
+          description: リソースを作成するリソースグループ名（存在しない場合はワークフローが自動作成します）
+          ui:help: '既存のリソースグループを指定、または自動作成されます'
 
         location:
           title: デプロイ先リージョン
@@ -125,6 +125,8 @@ spec:
           azureSubscriptionId: ${{ parameters.azureSubscriptionId }}
           resourceGroupName: ${{ parameters.resourceGroupName }}
           location: ${{ parameters.location }}
+          repoOwner: ${{ (parameters.repoUrl | parseRepoUrl).owner }}
+          repoName: ${{ (parameters.repoUrl | parseRepoUrl).repo }}
 
     - id: publish
       name: GitHubに発行

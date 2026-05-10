@@ -35,7 +35,8 @@ gh secret set AZURE_TENANT_ID -b "<service-principal-tenant-id>"
 
 ### 2. サービスプリンシパルの作成
 
-Azure CLIを使用してサービスプリンシパルを作成し、Contributorロールを付与します：
+Azure CLIを使用してサービスプリンシパルを作成し、サブスクリプションスコープでContributorロールを付与します。
+ワークフロー内で `az group create` によるリソースグループ作成を行う場合、このスコープが必要です。
 
 ```bash
 az ad sp create-for-rbac \

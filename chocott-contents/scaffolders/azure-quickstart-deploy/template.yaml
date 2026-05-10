@@ -1,0 +1,156 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: azure-quickstart-deploy
+  title: Azure Quickstart テンプレートデプロイ
+  description: tkeydll/azure-quickstart-templates リポジトリのARMテンプレートをAzureにデプロイするためのGitHubリポジトリを作成します
+  tags:
+    - azure
+    - arm
+    - infrastructure
+spec:
+  owner: user:guest
+  type: infrastructure
+
+  parameters:
+    - title: プロジェクト情報
+      required:
+        - projectName
+        - description
+      properties:
+        projectName:
+          title: プロジェクト名
+          type: string
+          description: プロジェクトの一意の識別子
+          ui:autofocus: true
+          pattern: '^[a-z0-9-]{3,50}$'
+          ui:help: '3〜50文字の小文字、数字、ハイフンのみ'
+
+        description:
+          title: 説明
+          type: string
+          description: このプロジェクトの説明
+
+    - title: Quickstartテンプレート選択
+      required:
+        - templateName
+      properties:
+        templateName:
+          title: デプロイするテンプレート
+          type: string
+          description: tkeydll/azure-quickstart-templates リポジトリから使用するテンプレートを選択してください
+          enum:
+            - 101-vm-simple-linux
+            - 101-function-app-create-dynamic
+            - 101-cosmosdb-create-arm-template
+            - 101-storage-account-create
+            - 101-aks
+          enumNames:
+            - 'シンプルなLinux仮想マシン (101-vm-simple-linux)'
+            - 'Azure Functions 消費プラン (101-function-app-create-dynamic)'
+            - 'Azure Cosmos DB (101-cosmosdb-create-arm-template)'
+            - 'ストレージアカウント (101-storage-account-create)'
+            - 'Azure Kubernetes Service (101-aks)'
+          default: 101-vm-simple-linux
+
+    - title: Azure設定
+      required:
+        - azureSubscriptionId
+        - resourceGroupName
+        - location
+      properties:
+        azureSubscriptionId:
+          title: Azureサブスクリプション ID
+          type: string
+          description: デプロイ先のAzureサブスクリプション ID
+          ui:help: 'az account show --query id -o tsv で確認できます'
+
+        resourceGroupName:
+          title: リソースグループ名
+          type: string
+          description: リソースを作成するリソースグループ名（存在しない場合はワークフローが自動作成します）
+          ui:help: '既存のリソースグループを指定、または自動作成されます'
+
+        location:
+          title: デプロイ先リージョン
+          type: string
+          enum:
+            - japaneast
+            - japanwest
+            - eastasia
+            - southeastasia
+            - westeurope
+            - eastus
+            - westus
+          enumNames:
+            - 'Japan East（東日本）'
+            - 'Japan West（西日本）'
+            - 'East Asia（東アジア）'
+            - 'Southeast Asia（東南アジア）'
+            - 'West Europe（西ヨーロッパ）'
+            - 'East US（米国東部）'
+            - 'West US（米国西部）'
+          default: japaneast
+          description: Azureリソースをデプロイするリージョン
+
+    - title: リポジトリ情報
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: リポジトリロケーション
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+
+  steps:
+    - id: fetch-arm-template
+      name: ARMテンプレートを取得
+      action: fetch:plain
+      input:
+        url: https://github.com/tkeydll/azure-quickstart-templates/tree/master/${{ parameters.templateName }}
+        targetPath: ./arm-template
+
+    - id: fetch-base
+      name: ワークフローとドキュメントを取得
+      action: fetch:template
+      input:
+        url: ./contents
+        values:
+          projectName: ${{ parameters.projectName }}
+          description: ${{ parameters.description }}
+          templateName: ${{ parameters.templateName }}
+          azureSubscriptionId: ${{ parameters.azureSubscriptionId }}
+          resourceGroupName: ${{ parameters.resourceGroupName }}
+          location: ${{ parameters.location }}
+          repoOwner: ${{ (parameters.repoUrl | parseRepoUrl).owner }}
+          repoName: ${{ (parameters.repoUrl | parseRepoUrl).repo }}
+
+    - id: publish
+      name: GitHubに発行
+      action: publish:github
+      input:
+        description: ${{ parameters.description }}
+        repoUrl: ${{ parameters.repoUrl }}
+        defaultBranch: main
+        gitAuthorName: Backstage Scaffolder
+        gitAuthorEmail: scaffolder@backstage.io
+
+    - id: register
+      name: カタログに登録
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+  output:
+    links:
+      - title: リポジトリ
+        url: ${{ steps['publish'].output.remoteUrl }}
+      - title: GitHub Actions
+        url: ${{ steps['publish'].output.remoteUrl }}/actions
+      - title: カタログで表示
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}
